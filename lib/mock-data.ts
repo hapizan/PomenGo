@@ -38,6 +38,8 @@ export const mockCars: Car[] = [
     year: 2020,
     plate: "ABC-1234",
     mileage: 45000,
+    // Using local image from public/image folder
+    image_url: "/image/camry.png",
   },
   {
     id: "car-2",
@@ -47,6 +49,8 @@ export const mockCars: Car[] = [
     year: 2019,
     plate: "XYZ-5678",
     mileage: 60000,
+    // Using local image from public/image folder
+    image_url: "/image/honda_civic.png",
   },
 ];
 
@@ -81,6 +85,38 @@ export const mockMechanics: Mechanic[] = [
       facebook: 4.8,
       youtube: 5.0,
       tiktok: 4.7,
+    },
+  },
+  {
+    id: "mech-3",
+    user_id: "user-5",
+    name: "Ahmad Rahman",
+    rating: 4.7,
+    total_jobs: 120,
+    specialties: ["Tire Service", "Suspension", "Alignment"],
+    location_lat: 3.1580,
+    location_lng: 101.7120,
+    is_available: false,
+    platform_ratings: {
+      facebook: 4.6,
+      youtube: 4.8,
+      tiktok: 4.5,
+    },
+  },
+  {
+    id: "mech-4",
+    user_id: "user-6",
+    name: "Lim Wei Ming",
+    rating: 4.9,
+    total_jobs: 180,
+    specialties: ["Transmission", "Clutch Service", "Engine Tuning"],
+    location_lat: 3.1000,
+    location_lng: 101.6500,
+    is_available: true,
+    platform_ratings: {
+      facebook: 4.9,
+      youtube: 5.0,
+      tiktok: 4.8,
     },
   },
 ];

@@ -12,6 +12,7 @@ import { JOB_STATUS_LABELS } from "@/lib/constants";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { motion } from "framer-motion";
 import { FloatingTools } from "@/components/animated/FloatingTools";
+import { cn } from "@/lib/utils";
 import {
   Wrench,
   CheckCircle2,
@@ -134,139 +135,48 @@ export default function CustomerDashboard() {
         </div>
       </motion.div>
 
-      {/* Enhanced Stats Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 relative z-10">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-        >
-          <Card className="hover:shadow-lg transition-all duration-300 border-l-4 border-l-blue-500">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                {t("customer.dashboard.activeJobs")}
-              </CardTitle>
-              <div className="h-8 w-8 rounded-full bg-blue-500/10 flex items-center justify-center">
-                <Activity className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold">{activeJobs.length}</div>
-              <p className="text-xs text-muted-foreground mt-1">
-                {pendingJobs.length} {pendingJobs.length === 1 ? "pending" : "pending"}
-              </p>
-            </CardContent>
-          </Card>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-        >
-          <Card className="hover:shadow-lg transition-all duration-300 border-l-4 border-l-green-500">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                {t("customer.dashboard.completed")}
-              </CardTitle>
-              <div className="h-8 w-8 rounded-full bg-green-500/10 flex items-center justify-center">
-                <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold">{completedJobs.length}</div>
-              <p className="text-xs text-muted-foreground mt-1">
-                All time completed
-              </p>
-            </CardContent>
-          </Card>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-        >
-          <Card className="hover:shadow-lg transition-all duration-300 border-l-4 border-l-purple-500">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                Total Spent
-              </CardTitle>
-              <div className="h-8 w-8 rounded-full bg-purple-500/10 flex items-center justify-center">
-                <DollarSign className="h-4 w-4 text-purple-600 dark:text-purple-400" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold">RM {totalSpent.toLocaleString()}</div>
-              <p className="text-xs text-muted-foreground mt-1">
-                Across {completedJobs.length} {completedJobs.length === 1 ? "service" : "services"}
-              </p>
-            </CardContent>
-          </Card>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.4 }}
-        >
-          <Card className="hover:shadow-lg transition-all duration-300 border-l-4 border-l-orange-500">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                My Vehicles
-              </CardTitle>
-              <div className="h-8 w-8 rounded-full bg-orange-500/10 flex items-center justify-center">
-                <CarIcon className="h-4 w-4 text-orange-600 dark:text-orange-400" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold">{cars.length}</div>
-              <p className="text-xs text-muted-foreground mt-1">
-                Registered vehicles
-              </p>
-            </CardContent>
-          </Card>
-        </motion.div>
-      </div>
-
-      {/* Quick Actions */}
+      {/* Quick Actions - Moved to top */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.5 }}
+        transition={{ duration: 0.5, delay: 0.1 }}
         className="relative z-10"
       >
-        <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Zap className="h-5 w-5 text-primary" />
+        <Card className="bg-gradient-to-br from-primary/10 via-primary/5 to-primary/10 border-primary/30 shadow-md overflow-hidden relative">
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-50" />
+          <div className="absolute top-0 right-0 w-40 h-40 bg-primary/5 rounded-full -mr-20 -mt-20 blur-2xl" />
+          <CardHeader className="relative z-10 py-3 px-4">
+            <CardTitle className="flex items-center gap-2 text-primary text-sm">
+              <div className="p-1.5 rounded-lg bg-primary/10">
+                <Zap className="h-4 w-4 text-primary" />
+              </div>
               {t("customer.dashboard.quickActions")}
             </CardTitle>
-            <CardDescription>{t("customer.dashboard.quickActionsDesc")}</CardDescription>
+            <CardDescription className="text-primary/70 text-xs mt-1">{t("customer.dashboard.quickActionsDesc")}</CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <CardContent className="relative z-10 px-4 pb-3">
+            <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
               <Link href="/customer/issue">
-                <Button className="w-full h-auto py-6 flex flex-col items-center gap-2 bg-primary hover:bg-primary/90">
-                  <AlertCircle className="h-6 w-6" />
+                <Button className="w-full h-auto py-3 flex flex-col items-center gap-1.5 bg-gradient-to-br from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white shadow-md shadow-red-500/20 transition-all text-xs">
+                  <AlertCircle className="h-4 w-4" />
                   <span>{t("customer.dashboard.reportIssue")}</span>
                 </Button>
               </Link>
               <Link href="/customer/cars/new">
-                <Button variant="outline" className="w-full h-auto py-6 flex flex-col items-center gap-2 hover:bg-accent">
-                  <Plus className="h-6 w-6" />
+                <Button className="w-full h-auto py-3 flex flex-col items-center gap-1.5 bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-md shadow-blue-500/20 transition-all text-xs">
+                  <Plus className="h-4 w-4" />
                   <span>{t("customer.dashboard.addCar")}</span>
                 </Button>
               </Link>
               <Link href="/customer/ai-check">
-                <Button variant="outline" className="w-full h-auto py-6 flex flex-col items-center gap-2 hover:bg-accent">
-                  <Wrench className="h-6 w-6" />
+                <Button className="w-full h-auto py-3 flex flex-col items-center gap-1.5 bg-gradient-to-br from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white shadow-md shadow-purple-500/20 transition-all text-xs">
+                  <Wrench className="h-4 w-4" />
                   <span>AI Check</span>
                 </Button>
               </Link>
               <Link href="/customer/cars">
-                <Button variant="outline" className="w-full h-auto py-6 flex flex-col items-center gap-2 hover:bg-accent">
-                  <CarIcon className="h-6 w-6" />
+                <Button className="w-full h-auto py-3 flex flex-col items-center gap-1.5 bg-gradient-to-br from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white shadow-md shadow-green-500/20 transition-all text-xs">
+                  <CarIcon className="h-4 w-4" />
                   <span>My Cars</span>
                 </Button>
               </Link>
@@ -275,6 +185,61 @@ export default function CustomerDashboard() {
         </Card>
       </motion.div>
 
+      {/* Small Stats Cards - Only Active Jobs and My Vehicles */}
+      <div className="grid gap-3 md:grid-cols-2 relative z-10">
+        {activeJobs.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
+            <Card className="hover:shadow-lg transition-all duration-300 border-l-2 border-l-blue-500 bg-gradient-to-br from-blue-50/50 to-blue-100/30 dark:from-blue-950/20 dark:to-blue-900/10 overflow-hidden relative">
+              <div className="absolute top-0 right-0 w-20 h-20 bg-blue-500/5 rounded-full -mr-10 -mt-10 blur-xl" />
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 pt-3 px-4 relative z-10">
+                <CardTitle className="text-xs font-medium text-blue-700 dark:text-blue-300">
+                  {t("customer.dashboard.activeJobs")}
+                </CardTitle>
+                <div className="h-7 w-7 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-md shadow-blue-500/20">
+                  <Activity className="h-3.5 w-3.5 text-white" />
+                </div>
+              </CardHeader>
+              <CardContent className="relative z-10 px-4 pb-3">
+                <div className="text-2xl font-bold text-blue-700 dark:text-blue-300">{activeJobs.length}</div>
+                <p className="text-xs text-blue-600/70 dark:text-blue-400/70 mt-0.5">
+                  {pendingJobs.length} {pendingJobs.length === 1 ? "pending" : "pending"}
+                </p>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
+
+        {cars.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+          >
+            <Card className="hover:shadow-lg transition-all duration-300 border-l-2 border-l-orange-500 bg-gradient-to-br from-orange-50/50 to-orange-100/30 dark:from-orange-950/20 dark:to-orange-900/10 overflow-hidden relative">
+              <div className="absolute top-0 right-0 w-20 h-20 bg-orange-500/5 rounded-full -mr-10 -mt-10 blur-xl" />
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 pt-3 px-4 relative z-10">
+                <CardTitle className="text-xs font-medium text-orange-700 dark:text-orange-300">
+                  My Vehicles
+                </CardTitle>
+                <div className="h-7 w-7 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-md shadow-orange-500/20">
+                  <CarIcon className="h-3.5 w-3.5 text-white" />
+                </div>
+              </CardHeader>
+              <CardContent className="relative z-10 px-4 pb-3">
+                <div className="text-2xl font-bold text-orange-700 dark:text-orange-300">{cars.length}</div>
+                <p className="text-xs text-orange-600/70 dark:text-orange-400/70 mt-0.5">
+                  Registered vehicles
+                </p>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
+      </div>
+
       {/* Active Jobs */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -282,12 +247,15 @@ export default function CustomerDashboard() {
         transition={{ duration: 0.5, delay: 0.6 }}
         className="relative z-10"
       >
-        <Card className="hover:shadow-lg transition-shadow">
-          <CardHeader>
+        <Card className="hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-slate-50/50 to-slate-100/30 dark:from-slate-950/20 dark:to-slate-900/10 border-2 border-slate-200/50 dark:border-slate-800/50 overflow-hidden relative">
+          <div className="absolute top-0 right-0 w-96 h-96 bg-primary/5 rounded-full -mr-48 -mt-48 blur-3xl" />
+          <CardHeader className="relative z-10">
             <div className="flex items-center justify-between">
               <div>
                 <CardTitle className="flex items-center gap-2">
-                  <Clock className="h-5 w-5" />
+                  <div className="p-2 rounded-lg bg-primary/10">
+                    <Clock className="h-5 w-5 text-primary" />
+                  </div>
                   {t("customer.dashboard.activeJobsList")}
                 </CardTitle>
                 <CardDescription className="mt-1">
@@ -295,13 +263,13 @@ export default function CustomerDashboard() {
                 </CardDescription>
               </div>
               {activeJobs.length > 0 && (
-                <Badge variant="secondary" className="text-sm">
+                <Badge className="text-sm bg-primary/10 text-primary border-primary/20">
                   {activeJobs.length} {activeJobs.length === 1 ? "job" : "jobs"}
                 </Badge>
               )}
             </div>
           </CardHeader>
-          <CardContent>
+          <CardContent className="relative z-10">
             {loading ? (
               <div className="text-center py-12 text-muted-foreground">
                 <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -309,104 +277,120 @@ export default function CustomerDashboard() {
               </div>
             ) : activeJobs.length === 0 ? (
               <div className="text-center py-12">
-                <div className="mx-auto h-16 w-16 rounded-full bg-muted flex items-center justify-center mb-4">
-                  <Wrench className="h-8 w-8 text-muted-foreground" />
+                <div className="mx-auto h-16 w-16 rounded-full bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center mb-4">
+                  <Wrench className="h-8 w-8 text-primary" />
                 </div>
                 <h3 className="text-lg font-semibold mb-2">No Active Jobs</h3>
                 <p className="text-muted-foreground mb-6 max-w-sm mx-auto">
                   {t("customer.dashboard.noActiveJobs")}
                 </p>
                 <Link href="/customer/issue">
-                  <Button>
+                  <Button className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70">
                     <Plus className="h-4 w-4 mr-2" />
                     {t("customer.dashboard.reportIssue")}
                   </Button>
                 </Link>
               </div>
             ) : (
-              <div className="space-y-4">
+              <div className="grid gap-4 md:grid-cols-2">
                 {activeJobs.map((job, idx) => {
                   const carInfo = getCarInfo(job.car_id);
                   const progress = getProgress(job.status);
                   
+                  // Get status-based gradient colors
+                  const getStatusGradient = (status: string) => {
+                    switch (status) {
+                      case "pending":
+                        return "from-yellow-50/50 to-yellow-100/30 dark:from-yellow-950/20 dark:to-yellow-900/10 border-yellow-500/30";
+                      case "accepted":
+                        return "from-blue-50/50 to-blue-100/30 dark:from-blue-950/20 dark:to-blue-900/10 border-blue-500/30";
+                      case "diagnosing":
+                        return "from-purple-50/50 to-purple-100/30 dark:from-purple-950/20 dark:to-purple-900/10 border-purple-500/30";
+                      case "repairing":
+                        return "from-orange-50/50 to-orange-100/30 dark:from-orange-950/20 dark:to-orange-900/10 border-orange-500/30";
+                      default:
+                        return "from-primary/5 to-primary/10 border-primary/30";
+                    }
+                  };
+                  
                   return (
                     <motion.div
                       key={job.id}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.3, delay: idx * 0.1 }}
                       className="group"
                     >
-                      <Card className="hover:shadow-md transition-all duration-300 border-l-4 border-l-primary">
-                        <CardContent className="p-6">
-                          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-                            <div className="flex-1 space-y-4">
-                              {/* Header */}
-                              <div className="flex items-start justify-between">
-                                <div className="space-y-1">
-                                  <div className="flex items-center gap-3">
-                                    <h3 className="text-lg font-semibold">{job.service_type}</h3>
-                                    <Badge className={getStatusColor(job.status)}>
-                                      {JOB_STATUS_LABELS[job.status]}
-                                    </Badge>
-                                  </div>
-                                  <p className="text-sm text-muted-foreground">{job.description}</p>
-                                </div>
+                      <Card className={cn(
+                        "hover:shadow-lg transition-all duration-300 border-l-4 bg-gradient-to-br overflow-hidden relative h-full",
+                        getStatusGradient(job.status)
+                      )}>
+                        <div className="absolute top-0 right-0 w-40 h-40 bg-primary/5 rounded-full -mr-20 -mt-20 blur-2xl" />
+                        <CardContent className="p-5 relative z-10 flex flex-col h-full">
+                          <div className="flex-1 space-y-3">
+                            {/* Header */}
+                            <div className="space-y-1">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <h3 className="text-base font-semibold">{job.service_type}</h3>
+                                <Badge className={getStatusColor(job.status)}>
+                                  {JOB_STATUS_LABELS[job.status]}
+                                </Badge>
                               </div>
+                              <p className="text-sm text-muted-foreground line-clamp-2">{job.description}</p>
+                            </div>
 
-                              {/* Car Info & Details */}
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t">
-                                {carInfo && (
-                                  <div className="flex items-center gap-2 text-sm">
-                                    <CarIcon className="h-4 w-4 text-muted-foreground" />
-                                    <span className="font-medium">{carInfo.brand} {carInfo.model}</span>
-                                    <span className="text-muted-foreground">({carInfo.year})</span>
-                                  </div>
-                                )}
+                            {/* Car Info & Details */}
+                            <div className="space-y-2 pt-2 border-t">
+                              {carInfo && (
+                                <div className="flex items-center gap-2 text-sm">
+                                  <CarIcon className="h-4 w-4 text-muted-foreground" />
+                                  <span className="font-medium">{carInfo.brand} {carInfo.model}</span>
+                                  <span className="text-muted-foreground">({carInfo.year})</span>
+                                </div>
+                              )}
+                              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                <Calendar className="h-4 w-4" />
+                                <span>Created {formatRelativeTime(job.timestamp_created)}</span>
+                              </div>
+                              {job.ai_estimated_price && (
+                                <div className="flex items-center gap-2 text-sm">
+                                  <DollarSign className="h-4 w-4 text-muted-foreground" />
+                                  <span className="font-medium">Est. RM {job.ai_estimated_price}</span>
+                                </div>
+                              )}
+                              {job.mechanic_id && (
                                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                  <Calendar className="h-4 w-4" />
-                                  <span>Created {formatRelativeTime(job.timestamp_created)}</span>
+                                  <Wrench className="h-4 w-4" />
+                                  <span>Mechanic assigned</span>
                                 </div>
-                                {job.ai_estimated_price && (
-                                  <div className="flex items-center gap-2 text-sm">
-                                    <DollarSign className="h-4 w-4 text-muted-foreground" />
-                                    <span className="font-medium">Est. RM {job.ai_estimated_price}</span>
-                                  </div>
-                                )}
-                                {job.mechanic_id && (
-                                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                    <Wrench className="h-4 w-4" />
-                                    <span>Mechanic assigned</span>
-                                  </div>
-                                )}
-                              </div>
-
-                              {/* Progress Bar */}
-                              <div className="space-y-2">
-                                <div className="flex items-center justify-between text-xs text-muted-foreground">
-                                  <span>Progress</span>
-                                  <span>{progress}%</span>
-                                </div>
-                                <div className="h-2 bg-muted rounded-full overflow-hidden">
-                                  <motion.div
-                                    initial={{ width: 0 }}
-                                    animate={{ width: `${progress}%` }}
-                                    transition={{ duration: 0.5, delay: idx * 0.1 + 0.3 }}
-                                    className="h-full bg-primary rounded-full"
-                                  />
-                                </div>
-                              </div>
+                              )}
                             </div>
 
-                            {/* Action Button */}
-                            <div className="flex items-center lg:flex-col gap-2">
-                              <Link href={`/customer/job/${job.id}`} className="flex-1 lg:w-full">
-                                <Button className="w-full group-hover:bg-primary/90">
-                                  {t("customer.dashboard.viewDetails")}
-                                  <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
-                                </Button>
-                              </Link>
+                            {/* Progress Bar */}
+                            <div className="space-y-2 pt-2">
+                              <div className="flex items-center justify-between text-xs text-muted-foreground">
+                                <span>Progress</span>
+                                <span>{progress}%</span>
+                              </div>
+                              <div className="h-2 bg-muted rounded-full overflow-hidden">
+                                <motion.div
+                                  initial={{ width: 0 }}
+                                  animate={{ width: `${progress}%` }}
+                                  transition={{ duration: 0.5, delay: idx * 0.1 + 0.3 }}
+                                  className="h-full bg-primary rounded-full"
+                                />
+                              </div>
                             </div>
+                          </div>
+
+                          {/* Action Button */}
+                          <div className="pt-3 mt-auto">
+                            <Link href={`/customer/job/${job.id}`}>
+                              <Button className="w-full group-hover:bg-primary/90 text-sm">
+                                {t("customer.dashboard.viewDetails")}
+                                <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                              </Button>
+                            </Link>
                           </div>
                         </CardContent>
                       </Card>

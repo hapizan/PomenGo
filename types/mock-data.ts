@@ -9,6 +9,7 @@ export interface Car {
   year: number;
   plate: string;
   mileage: number;
+  image_url?: string;
 }
 
 export interface MockData {

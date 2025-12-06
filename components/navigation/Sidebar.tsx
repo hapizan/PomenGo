@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { Home, Wrench, Wallet, User, Settings } from "lucide-react";
+import { Home, Wrench, Wallet, User, Settings, MapPin } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 interface NavItem {
@@ -20,6 +20,7 @@ export function Sidebar({ role = "customer" }: { role?: "customer" | "mechanic" 
   const customerNavItems: NavItem[] = [
     { labelKey: "nav.dashboard", href: "/customer", icon: <Home className="h-5 w-5" /> },
     { labelKey: "nav.cars", href: "/customer/cars", icon: <Wrench className="h-5 w-5" /> },
+    { labelKey: "nav.mechanics", href: "/customer/mechanics", icon: <MapPin className="h-5 w-5" /> },
     { labelKey: "customer.dashboard.reportIssue", href: "/customer/issue", icon: <Wrench className="h-5 w-5" /> },
     { labelKey: "ai.title", href: "/customer/ai-check", icon: <Wrench className="h-5 w-5" /> },
   ];

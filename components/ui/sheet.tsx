@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useState, useEffect } from "react";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -13,6 +14,17 @@ interface SheetProps {
 }
 
 export function Sheet({ open, onOpenChange, children, side = "left" }: SheetProps) {
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    if (open) {
+      // Small delay to trigger animation
+      setTimeout(() => setIsVisible(true), 10);
+    } else {
+      setIsVisible(false);
+    }
+  }, [open]);
+
   if (!open) return null;
 
   const sideClasses = {
@@ -22,16 +34,27 @@ export function Sheet({ open, onOpenChange, children, side = "left" }: SheetProp
     bottom: "bottom-0 left-0 w-full",
   };
 
+  const transformClasses = {
+    left: isVisible ? "translate-x-0" : "-translate-x-full",
+    right: isVisible ? "translate-x-0" : "translate-x-full",
+    top: isVisible ? "translate-y-0" : "-translate-y-full",
+    bottom: isVisible ? "translate-y-0" : "translate-y-full",
+  };
+
   return (
     <>
       <div
-        className="fixed inset-0 z-50 bg-black/50"
+        className={cn(
+          "fixed inset-0 z-50 bg-black/50 transition-opacity duration-300",
+          isVisible ? "opacity-100" : "opacity-0"
+        )}
         onClick={() => onOpenChange?.(false)}
       />
       <div
         className={cn(
-          "fixed z-50 w-80 bg-background border-r shadow-lg transition-transform",
-          sideClasses[side]
+          "fixed z-50 w-80 max-w-[85vw] bg-background border-r shadow-lg transition-transform duration-300 ease-in-out",
+          sideClasses[side],
+          transformClasses[side]
         )}
       >
         {children}
@@ -51,15 +74,17 @@ export function SheetContent({
   ...props
 }: SheetContentProps) {
   return (
-    <div className={cn("flex flex-col h-full", className)} {...props}>
+    <div className={cn("flex flex-col h-full overflow-hidden", className)} {...props}>
       {onClose && (
-        <div className="flex justify-end p-4">
+        <div className="flex justify-end p-4 flex-shrink-0">
           <Button variant="ghost" size="icon" onClick={onClose}>
             <X className="h-4 w-4" />
           </Button>
         </div>
       )}
-      {children}
+      <div className="flex-1 overflow-y-auto">
+        {children}
+      </div>
     </div>
   );
 }
