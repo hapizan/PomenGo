@@ -243,8 +243,8 @@ export function Header({ title = "PomenGO", navItems = [] }: HeaderProps) {
         </div>
       </div>
 
-      <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-        <SheetContent side="left" onClose={() => setMobileMenuOpen(false)}>
+      <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen} side="left">
+        <SheetContent onClose={() => setMobileMenuOpen(false)}>
           <SheetHeader>
             <SheetTitle className="flex items-center gap-2">
               <div className={cn("h-8 w-8 rounded-lg flex items-center justify-center", config.color)}>
