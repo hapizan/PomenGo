@@ -32,6 +32,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
+import { getNavItems } from "@/lib/navigation-config";
 
 interface HeaderProps {
   title?: string;
@@ -78,7 +79,7 @@ const roleConfig = {
   },
 };
 
-export function Header({ title = "PomenGO", navItems = [] }: HeaderProps) {
+export function Header({ title = "PomenGO", navItems: propNavItems }: HeaderProps) {
   const { t } = useLanguage();
   const { user, logout, isAuthenticated } = useAuth();
   const pathname = usePathname();
@@ -87,6 +88,18 @@ export function Header({ title = "PomenGO", navItems = [] }: HeaderProps) {
   const role = user?.role || "customer";
   const config = roleConfig[role as keyof typeof roleConfig] || roleConfig.customer;
   const RoleIcon = config.icon;
+  
+  // Use navigation items from prop or get from config
+  const navItems = propNavItems && propNavItems.length > 0 
+    ? propNavItems 
+    : getNavItems(role).map(item => {
+        const IconComponent = item.icon;
+        return {
+          label: t(item.labelKey),
+          href: item.href,
+          icon: <IconComponent className="h-4 w-4" />,
+        };
+      });
   
   // Get user initials for avatar
   const getInitials = (name: string) => {
@@ -107,9 +120,19 @@ export function Header({ title = "PomenGO", navItems = [] }: HeaderProps) {
             <Button
               variant="ghost"
               size="icon"
-              className="md:hidden flex-shrink-0"
-              onClick={() => setMobileMenuOpen(true)}
+              className="md:hidden flex-shrink-0 z-10"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setMobileMenuOpen(true);
+              }}
+              onTouchEnd={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setMobileMenuOpen(true);
+              }}
               aria-label="Open menu"
+              type="button"
             >
               <Menu className="h-5 w-5" />
             </Button>
@@ -250,106 +273,106 @@ export function Header({ title = "PomenGO", navItems = [] }: HeaderProps) {
       </div>
 
       <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen} side="left">
-        <SheetContent onClose={() => setMobileMenuOpen(false)}>
-          <div className="flex flex-col h-full">
-            <SheetHeader className="flex-shrink-0 pb-4">
-              <SheetTitle className="flex items-center gap-2">
-                <div className={cn("h-8 w-8 rounded-lg flex items-center justify-center", config.color)}>
-                  <span className="text-white font-bold text-sm">P</span>
-                </div>
-                <span className="truncate">{title}</span>
-              </SheetTitle>
-              {isAuthenticated && user && (
-                <div className="flex items-center gap-2 pt-3">
-                  <div className={cn(
-                    "h-8 w-8 rounded-full flex items-center justify-center text-white text-xs font-semibold flex-shrink-0",
-                    config.color
-                  )}>
-                    {getInitials(user.name)}
+          <SheetContent onClose={() => setMobileMenuOpen(false)}>
+            <div className="flex flex-col h-full">
+              <SheetHeader className="flex-shrink-0 pb-4">
+                <SheetTitle className="flex items-center gap-2">
+                  <div className={cn("h-8 w-8 rounded-lg flex items-center justify-center", config.color)}>
+                    <span className="text-white font-bold text-sm">P</span>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium truncate">{user.name}</p>
-                    <Badge className={cn("text-xs mt-1", config.badgeColor)}>
-                      <RoleIcon className="h-3 w-3 mr-1" />
-                      <span className="capitalize">{role}</span>
-                    </Badge>
-                  </div>
-                </div>
-              )}
-            </SheetHeader>
-            
-            <div className="flex-1 overflow-y-auto">
-              {isAuthenticated && user && (
-                <div className="space-y-4 pb-4">
-                  <div>
-                    <h3 className="text-sm font-semibold mb-2 text-muted-foreground px-4">Quick Actions</h3>
-                    <div className="space-y-1 px-2">
-                      {config.quickActions.map((action) => {
-                        const ActionIcon = action.icon;
-                        return (
-                          <Link
-                            key={action.href}
-                            href={action.href}
-                            onClick={() => setMobileMenuOpen(false)}
-                          >
-                            <Button
-                              variant="ghost"
-                              className={cn(
-                                "w-full justify-start gap-2",
-                                pathname?.startsWith(action.href) && "bg-accent"
-                              )}
-                            >
-                              <ActionIcon className="h-4 w-4" />
-                              {action.label}
-                            </Button>
-                          </Link>
-                        );
-                      })}
+                  <span className="truncate">{title}</span>
+                </SheetTitle>
+                {isAuthenticated && user && (
+                  <div className="flex items-center gap-2 pt-3">
+                    <div className={cn(
+                      "h-8 w-8 rounded-full flex items-center justify-center text-white text-xs font-semibold flex-shrink-0",
+                      config.color
+                    )}>
+                      {getInitials(user.name)}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium truncate">{user.name}</p>
+                      <Badge className={cn("text-xs mt-1", config.badgeColor)}>
+                        <RoleIcon className="h-3 w-3 mr-1" />
+                        <span className="capitalize">{role}</span>
+                      </Badge>
                     </div>
                   </div>
+                )}
+              </SheetHeader>
+              
+              <div className="flex-1 overflow-y-auto">
+                {isAuthenticated && user && (
+                  <div className="space-y-4 pb-4">
+                    <div>
+                      <h3 className="text-sm font-semibold mb-2 text-muted-foreground px-4">Quick Actions</h3>
+                      <div className="space-y-1 px-2">
+                        {config.quickActions.map((action) => {
+                          const ActionIcon = action.icon;
+                          return (
+                            <Link
+                              key={action.href}
+                              href={action.href}
+                              onClick={() => setMobileMenuOpen(false)}
+                            >
+                              <Button
+                                variant="ghost"
+                                className={cn(
+                                  "w-full justify-start gap-2",
+                                  pathname?.startsWith(action.href) && "bg-accent"
+                                )}
+                              >
+                                <ActionIcon className="h-4 w-4" />
+                                {action.label}
+                              </Button>
+                            </Link>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
+                <nav className={cn("flex flex-col gap-2 px-2", isAuthenticated && user && "mt-4")}>
+                  {navItems.map((item) => (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <Button
+                        variant="ghost"
+                        className={cn(
+                          "w-full justify-start gap-2",
+                          (pathname === item.href || pathname?.startsWith(item.href + "/")) && "bg-accent"
+                        )}
+                      >
+                        {item.icon}
+                        {item.label}
+                      </Button>
+                    </Link>
+                  ))}
+                </nav>
+              </div>
+              
+              {isAuthenticated && user && (
+                <div className="flex-shrink-0 pt-4 border-t mt-auto">
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start gap-2 text-destructive mx-2 mb-2"
+                    onClick={() => {
+                      logout();
+                      setMobileMenuOpen(false);
+                    }}
+                  >
+                    <LogOut className="h-4 w-4" />
+                    Logout
+                  </Button>
                 </div>
               )}
-              
-              <nav className={cn("flex flex-col gap-2 px-2", isAuthenticated && user && "mt-4")}>
-                {navItems.map((item) => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    <Button
-                      variant="ghost"
-                      className={cn(
-                        "w-full justify-start gap-2",
-                        pathname === item.href && "bg-accent"
-                      )}
-                    >
-                      {item.icon}
-                      {item.label}
-                    </Button>
-                  </Link>
-                ))}
-              </nav>
             </div>
-            
-            {isAuthenticated && user && (
-              <div className="flex-shrink-0 pt-4 border-t mt-auto">
-                <Button
-                  variant="ghost"
-                  className="w-full justify-start gap-2 text-destructive mx-2 mb-2"
-                  onClick={() => {
-                    logout();
-                    setMobileMenuOpen(false);
-                  }}
-                >
-                  <LogOut className="h-4 w-4" />
-                  Logout
-                </Button>
-              </div>
-            )}
-          </div>
-        </SheetContent>
-      </Sheet>
+          </SheetContent>
+        </Sheet>
     </header>
   );
 }

@@ -5,10 +5,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { getJobs } from "@/lib/mock-services";
+import { getJobs, getCarByJob, getCustomerByJob } from "@/lib/mock-services";
 import { Job } from "@/types/job";
 import { JOB_STATUS_LABELS } from "@/lib/constants";
-import { Map, List } from "lucide-react";
+import { Map, List, Car as CarIcon, User } from "lucide-react";
 import dynamic from "next/dynamic";
 
 // Dynamically import map to avoid SSR issues
@@ -111,41 +111,68 @@ export default function MechanicJobsPage() {
             </Card>
           ) : (
             <div className="space-y-4">
-              {filteredJobs.map((job) => (
-                <Card key={job.id}>
-                  <CardHeader>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <CardTitle>{job.service_type}</CardTitle>
-                        <CardDescription>{job.description}</CardDescription>
+              {filteredJobs.map((job) => {
+                const car = getCarByJob(job);
+                const customer = getCustomerByJob(job);
+                return (
+                  <Card key={job.id}>
+                    <CardHeader>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <CardTitle>{job.service_type}</CardTitle>
+                          <CardDescription>{job.description}</CardDescription>
+                        </div>
+                        <Badge>{JOB_STATUS_LABELS[job.status]}</Badge>
                       </div>
-                      <Badge>{JOB_STATUS_LABELS[job.status]}</Badge>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex items-center justify-between">
-                      <div className="space-y-1">
-                        {job.ai_estimated_price && (
-                          <p className="text-sm">
-                            <span className="text-muted-foreground">Estimated:</span>{" "}
-                            <span className="font-semibold">RM {job.ai_estimated_price}</span>
-                          </p>
-                        )}
-                        <p className="text-sm text-muted-foreground">
-                          {new Date(job.timestamp_created).toLocaleString()}
-                        </p>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-3">
+                        {/* Car and Customer Info */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pb-3 border-b">
+                          {car && (
+                            <div className="flex items-center gap-2 text-sm">
+                              <CarIcon className="h-4 w-4 text-muted-foreground" />
+                              <div>
+                                <span className="text-muted-foreground">Car: </span>
+                                <span className="font-medium">{car.brand} {car.model} ({car.year})</span>
+                              </div>
+                            </div>
+                          )}
+                          {customer && (
+                            <div className="flex items-center gap-2 text-sm">
+                              <User className="h-4 w-4 text-muted-foreground" />
+                              <div>
+                                <span className="text-muted-foreground">Requestor: </span>
+                                <span className="font-medium">{customer.name}</span>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <div className="space-y-1">
+                            {job.ai_estimated_price && (
+                              <p className="text-sm">
+                                <span className="text-muted-foreground">Estimated:</span>{" "}
+                                <span className="font-semibold">RM {job.ai_estimated_price}</span>
+                              </p>
+                            )}
+                            <p className="text-sm text-muted-foreground">
+                              {new Date(job.timestamp_created).toLocaleString()}
+                            </p>
+                          </div>
+                          <Link href={`/mechanic/jobs/${job.id}`}>
+                            <Button>
+                              {job.status === "pending" && !job.mechanic_id
+                                ? "Accept Job"
+                                : "View Details"}
+                            </Button>
+                          </Link>
+                        </div>
                       </div>
-                      <Link href={`/mechanic/jobs/${job.id}`}>
-                        <Button>
-                          {job.status === "pending" && !job.mechanic_id
-                            ? "Accept Job"
-                            : "View Details"}
-                        </Button>
-                      </Link>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                    </CardContent>
+                  </Card>
+                );
+              })}
             </div>
           )}
         </>

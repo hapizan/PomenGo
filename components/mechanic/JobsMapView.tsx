@@ -7,10 +7,11 @@ import { Job } from "@/types/job";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MapPin, DollarSign, Clock, Wrench } from "lucide-react";
+import { MapPin, DollarSign, Clock, Wrench, Car as CarIcon, User } from "lucide-react";
 import Link from "next/link";
 import { JOB_STATUS_LABELS } from "@/lib/constants";
 import { motion } from "framer-motion";
+import { getCarByJob, getCustomerByJob } from "@/lib/mock-services";
 
 // Fix for default marker icon issue in Next.js
 if (typeof window !== "undefined") {
@@ -116,19 +117,31 @@ export function JobsMapView({ jobs, filter, onJobSelect }: JobsMapViewProps) {
     // Add markers for active jobs
     activeJobs.forEach((job) => {
       const isAvailable = job.status === "pending" && !job.mechanic_id;
+      const car = getCarByJob(job);
+      const customer = getCustomerByJob(job);
       const marker = L.marker([job.location_lat, job.location_lng], {
         icon: createJobMarkerIcon(job.status, isAvailable),
       }).addTo(mapRef.current!);
 
       // Create popup content
       const popupContent = `
-        <div style="min-width: 200px;">
+        <div style="min-width: 220px;">
           <div style="font-weight: bold; margin-bottom: 8px; font-size: 14px;">
             ${job.service_type}
           </div>
           <div style="font-size: 12px; color: #666; margin-bottom: 8px;">
             ${job.description}
           </div>
+          ${car ? `
+            <div style="font-size: 11px; color: #666; margin-bottom: 4px;">
+              🚗 ${car.brand} ${car.model} (${car.year})
+            </div>
+          ` : ""}
+          ${customer ? `
+            <div style="font-size: 11px; color: #666; margin-bottom: 8px;">
+              👤 Requestor: ${customer.name}
+            </div>
+          ` : ""}
           <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 8px;">
             <span style="
               padding: 4px 8px;
@@ -142,7 +155,7 @@ export function JobsMapView({ jobs, filter, onJobSelect }: JobsMapViewProps) {
             </span>
           </div>
           ${job.ai_estimated_price ? `
-            <div style="font-size: 12px; color: #666;">
+            <div style="font-size: 12px; color: #666; margin-bottom: 8px;">
               Est. RM ${job.ai_estimated_price}
             </div>
           ` : ""}
@@ -256,6 +269,34 @@ export function JobsMapView({ jobs, filter, onJobSelect }: JobsMapViewProps) {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
+                {/* Car and Customer Info */}
+                {(() => {
+                  const car = getCarByJob(selectedJob);
+                  const customer = getCustomerByJob(selectedJob);
+                  return (car || customer) ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pb-3 border-b">
+                      {car && (
+                        <div className="flex items-center gap-2 p-3 bg-muted rounded-lg">
+                          <CarIcon className="h-4 w-4 text-primary" />
+                          <div>
+                            <p className="text-xs text-muted-foreground">Car</p>
+                            <p className="font-semibold text-sm">{car.brand} {car.model} ({car.year})</p>
+                          </div>
+                        </div>
+                      )}
+                      {customer && (
+                        <div className="flex items-center gap-2 p-3 bg-muted rounded-lg">
+                          <User className="h-4 w-4 text-primary" />
+                          <div>
+                            <p className="text-xs text-muted-foreground">Requestor</p>
+                            <p className="font-semibold text-sm">{customer.name}</p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ) : null;
+                })()}
+
                 <div className="grid grid-cols-2 gap-4">
                   {selectedJob.ai_estimated_price && (
                     <div className="flex items-center gap-2 p-3 bg-muted rounded-lg">

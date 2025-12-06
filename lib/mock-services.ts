@@ -1,12 +1,13 @@
 import { Job, JobCheckpoint, Quote } from "@/types/job";
 import { Car } from "@/types/mock-data";
-import { Mechanic } from "@/types/user";
+import { Mechanic, User } from "@/types/user";
 import {
   mockJobs,
   mockCars,
   mockMechanics,
   mockCheckpoints,
   mockQuotes,
+  mockUsers,
 } from "./mock-data";
 
 // Simulate API delay
@@ -96,5 +97,14 @@ export async function createJob(jobData: Partial<Job>): Promise<Job> {
     timestamp_created: new Date().toISOString(),
     ...jobData,
   };
+}
+
+// Helper functions to get related data
+export function getCarByJob(job: Job): Car | null {
+  return mockCars.find((car) => car.id === job.car_id) || null;
+}
+
+export function getCustomerByJob(job: Job): User | null {
+  return mockUsers.find((user) => user.id === job.customer_id) || null;
 }
 

@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -15,17 +16,28 @@ interface SheetProps {
 
 export function Sheet({ open, onOpenChange, children, side = "left" }: SheetProps) {
   const [isVisible, setIsVisible] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   useEffect(() => {
     if (open) {
+      // Prevent body scroll when sheet is open
+      document.body.style.overflow = "hidden";
       // Small delay to trigger animation
       setTimeout(() => setIsVisible(true), 10);
     } else {
       setIsVisible(false);
+      // Restore body scroll when sheet is closed
+      document.body.style.overflow = "";
     }
-  }, [open]);
 
-  if (!open) return null;
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [open]);
 
   const sideClasses = {
     left: "left-0 top-0 h-full",
@@ -41,26 +53,68 @@ export function Sheet({ open, onOpenChange, children, side = "left" }: SheetProp
     bottom: isVisible ? "translate-y-0" : "translate-y-full",
   };
 
-  return (
-    <>
+  if (!isMounted || !open) return null;
+
+  const sheetContent = (
+    <div 
+      className="fixed inset-0 pointer-events-none"
+      style={{ 
+        position: "fixed",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        zIndex: 9999
+      }}
+    >
       <div
         className={cn(
-          "fixed inset-0 z-50 bg-black/50 transition-opacity duration-300",
+          "fixed inset-0 bg-black/50 transition-opacity duration-300 pointer-events-auto",
           isVisible ? "opacity-100" : "opacity-0"
         )}
-        onClick={() => onOpenChange?.(false)}
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          zIndex: 9999
+        }}
+        onClick={() => {
+          onOpenChange?.(false);
+        }}
+        onTouchEnd={(e) => {
+          e.preventDefault();
+          onOpenChange?.(false);
+        }}
+        role="button"
+        tabIndex={-1}
+        aria-label="Close menu"
       />
       <div
         className={cn(
-          "fixed z-50 w-80 max-w-[85vw] bg-background border-r shadow-lg transition-transform duration-300 ease-in-out",
+          "fixed w-80 max-w-[85vw] bg-background border-r shadow-2xl transition-transform duration-300 ease-in-out pointer-events-auto",
           sideClasses[side],
           transformClasses[side]
         )}
+        style={{
+          zIndex: 10000,
+          position: "fixed"
+        }}
+        onClick={(e) => e.stopPropagation()}
+        onTouchStart={(e) => e.stopPropagation()}
       >
         {children}
       </div>
-    </>
+    </div>
   );
+
+  // Use portal to render at body level for PWA compatibility
+  if (typeof window !== "undefined") {
+    return createPortal(sheetContent, document.body);
+  }
+
+  return null;
 }
 
 interface SheetContentProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -74,15 +128,25 @@ export function SheetContent({
   ...props
 }: SheetContentProps) {
   return (
-    <div className={cn("flex flex-col h-full overflow-hidden", className)} {...props}>
+    <div 
+      className={cn("flex flex-col h-full overflow-hidden", className)} 
+      {...props}
+    >
       {onClose && (
         <div className="flex justify-end p-4 flex-shrink-0">
-          <Button variant="ghost" size="icon" onClick={onClose}>
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={onClose}
+          >
             <X className="h-4 w-4" />
           </Button>
         </div>
       )}
-      <div className="flex-1 overflow-y-auto">
+      <div 
+        className="flex-1 overflow-y-auto"
+        style={{ WebkitOverflowScrolling: "touch" }}
+      >
         {children}
       </div>
     </div>
