@@ -1,14 +1,30 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { getMechanics } from "@/lib/mock-services";
+import { Mechanic } from "@/types/user";
+import { RatingsDisplay } from "@/components/mechanic/RatingsDisplay";
 
 export default function MechanicProfilePage() {
   const [loading, setLoading] = useState(false);
+  const [mechanic, setMechanic] = useState<Mechanic | null>(null);
   const [isAvailable, setIsAvailable] = useState(true);
+
+  useEffect(() => {
+    async function loadMechanic() {
+      const mechanics = await getMechanics();
+      const currentMechanic = mechanics.find((m) => m.id === "mech-1");
+      setMechanic(currentMechanic || mechanics[0]);
+      if (currentMechanic) {
+        setIsAvailable(currentMechanic.is_available);
+      }
+    }
+    loadMechanic();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -79,7 +95,7 @@ export default function MechanicProfilePage() {
         </CardHeader>
         <CardContent>
           <div className="flex flex-wrap gap-2">
-            {["Engine Repair", "Brake Service", "AC Service"].map((spec) => (
+            {(mechanic?.specialties || ["Engine Repair", "Brake Service", "AC Service"]).map((spec) => (
               <Badge key={spec} variant="secondary">
                 {spec}
               </Badge>
@@ -90,6 +106,11 @@ export default function MechanicProfilePage() {
           </Button>
         </CardContent>
       </Card>
+
+      {/* Ratings Display */}
+      {mechanic && (
+        <RatingsDisplay mechanic={mechanic} />
+      )}
     </div>
   );
 }

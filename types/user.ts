@@ -19,6 +19,11 @@ export interface Mechanic {
   location_lat: number;
   location_lng: number;
   is_available: boolean;
+  platform_ratings?: {
+    facebook?: number;
+    youtube?: number;
+    tiktok?: number;
+  };
 }
 
 export interface Workshop {

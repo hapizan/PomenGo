@@ -9,30 +9,66 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { ThemeToggle } from "@/components/theme-toggle";
 import { LanguageToggle } from "@/components/language-toggle";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Mail, Lock, Facebook, Twitter, Chrome } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { Mail, Lock, Facebook, Twitter, Chrome, Info, ChevronDown, ChevronUp } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
   const { t } = useLanguage();
+  const { login } = useAuth();
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [showDemoAccounts, setShowDemoAccounts] = useState(false);
 
   const handleEmailLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
-    // Simulate login
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    setLoading(false);
-    router.push("/customer");
+    setError("");
+    
+    const result = await login(email, password);
+    
+    if (result.success && result.user) {
+      // AuthContext will handle redirect based on role
+      const roleRoutes: Record<string, string> = {
+        customer: "/customer",
+        mechanic: "/mechanic",
+        workshop: "/workshop",
+        admin: "/admin",
+      };
+      router.push(roleRoutes[result.user.role] || "/customer");
+    } else {
+      setError(result.error || "Login failed");
+      setLoading(false);
+    }
   };
 
   const handleSocialLogin = async (provider: string) => {
     setLoading(true);
-    // Simulate social login
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    setLoading(false);
-    router.push("/customer");
+    setError("");
+    // For demo, use a default email based on provider
+    const demoEmails: Record<string, string> = {
+      facebook: "customer@example.com",
+      twitter: "mechanic@example.com",
+      gmail: "admin@example.com",
+    };
+    const demoEmail = demoEmails[provider] || "customer@example.com";
+    
+    const result = await login(demoEmail, "password");
+    
+    if (result.success && result.user) {
+      const roleRoutes: Record<string, string> = {
+        customer: "/customer",
+        mechanic: "/mechanic",
+        workshop: "/workshop",
+        admin: "/admin",
+      };
+      router.push(roleRoutes[result.user.role] || "/customer");
+    } else {
+      setError(result.error || "Login failed");
+      setLoading(false);
+    }
   };
 
   return (
@@ -49,11 +85,11 @@ export default function LoginPage() {
         <div className="flex items-center justify-between mb-8">
           <Link href="/" className="flex items-center gap-2">
             <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center">
-              <span className="text-white font-bold text-lg">M</span>
+              <span className="text-white font-bold text-lg">P</span>
             </div>
             <div>
-              <span className="text-xl font-bold">MechanicOnDemand</span>
-              <p className="text-xs text-muted-foreground">Grab for Mechanics</p>
+              <span className="text-xl font-bold">PomenGO</span>
+              <p className="text-xs text-muted-foreground">Your Trusted Auto Repair Partner</p>
             </div>
           </Link>
           <div className="flex items-center gap-2">
@@ -70,6 +106,58 @@ export default function LoginPage() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
+            {/* Demo Accounts Info */}
+            <div className="bg-muted/50 rounded-lg border border-muted">
+              <button
+                type="button"
+                onClick={() => setShowDemoAccounts(!showDemoAccounts)}
+                className="w-full flex items-center justify-between p-3 text-sm font-medium hover:bg-muted/50 transition-colors rounded-lg"
+              >
+                <div className="flex items-center gap-2">
+                  <Info className="h-4 w-4 text-primary" />
+                  <span>Demo Login Accounts</span>
+                </div>
+                {showDemoAccounts ? (
+                  <ChevronUp className="h-4 w-4" />
+                ) : (
+                  <ChevronDown className="h-4 w-4" />
+                )}
+              </button>
+              {showDemoAccounts && (
+                <div className="px-3 pb-3 space-y-3 text-sm">
+                  <div className="space-y-2">
+                    <div className="font-semibold text-foreground">Customer Account</div>
+                    <div className="text-muted-foreground space-y-1">
+                      <div>Email: <span className="font-mono text-foreground">customer@example.com</span></div>
+                      <div>Password: <span className="text-foreground">Any password</span></div>
+                    </div>
+                  </div>
+                  <div className="border-t pt-2 space-y-2">
+                    <div className="font-semibold text-foreground">Mechanic Account</div>
+                    <div className="text-muted-foreground space-y-1">
+                      <div>Email: <span className="font-mono text-foreground">mechanic@example.com</span></div>
+                      <div>Password: <span className="text-foreground">Any password</span></div>
+                    </div>
+                  </div>
+                  <div className="border-t pt-2 space-y-2">
+                    <div className="font-semibold text-foreground">Admin Account</div>
+                    <div className="text-muted-foreground space-y-1">
+                      <div>Email: <span className="font-mono text-foreground">admin@example.com</span></div>
+                      <div>Password: <span className="text-foreground">Any password</span></div>
+                    </div>
+                  </div>
+                  <div className="border-t pt-2">
+                    <div className="font-semibold text-foreground mb-1">Social Login Demo</div>
+                    <div className="text-muted-foreground space-y-1 text-xs">
+                      <div>• Facebook → Customer</div>
+                      <div>• Twitter → Mechanic</div>
+                      <div>• Gmail → Admin</div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
             {/* Social Login Buttons */}
             <div className="space-y-3">
               <Button
@@ -115,6 +203,13 @@ export default function LoginPage() {
                 <span className="bg-card px-2 text-muted-foreground">{t("auth.orContinue")}</span>
               </div>
             </div>
+
+            {/* Error Message */}
+            {error && (
+              <div className="bg-destructive/10 text-destructive text-sm p-3 rounded-md border border-destructive/20">
+                {error}
+              </div>
+            )}
 
             {/* Email Login Form */}
             <form onSubmit={handleEmailLogin} className="space-y-4">

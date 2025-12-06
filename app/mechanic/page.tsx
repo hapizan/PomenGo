@@ -5,23 +5,32 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { getJobs } from "@/lib/mock-services";
+import { getJobs, getMechanics } from "@/lib/mock-services";
 import { Job } from "@/types/job";
+import { Mechanic } from "@/types/user";
 import { JOB_STATUS_LABELS } from "@/lib/constants";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { RatingsDisplay } from "@/components/mechanic/RatingsDisplay";
 
 export default function MechanicDashboard() {
   const { t } = useLanguage();
   const [jobs, setJobs] = useState<Job[]>([]);
+  const [mechanic, setMechanic] = useState<Mechanic | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function loadJobs() {
-      const data = await getJobs();
-      setJobs(data);
+    async function loadData() {
+      const [jobsData, mechanicsData] = await Promise.all([
+        getJobs(),
+        getMechanics(),
+      ]);
+      setJobs(jobsData);
+      // Get current mechanic (mech-1 for demo)
+      const currentMechanic = mechanicsData.find((m) => m.id === "mech-1");
+      setMechanic(currentMechanic || mechanicsData[0]);
       setLoading(false);
     }
-    loadJobs();
+    loadData();
   }, []);
 
   const activeJobs = jobs.filter((j) => j.mechanic_id === "mech-1" && j.status !== "completed");
@@ -60,10 +69,22 @@ export default function MechanicDashboard() {
             <CardDescription>{t("mechanic.dashboard.ratingDesc")}</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">4.8 ⭐</div>
+            <div className="text-3xl font-bold">
+              {mechanic?.rating.toFixed(1) || "4.8"} ⭐
+            </div>
+            {mechanic?.platform_ratings && (
+              <div className="mt-2 text-xs text-muted-foreground">
+                Across all platforms
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
+
+      {/* Ratings Display */}
+      {mechanic && (
+        <RatingsDisplay mechanic={mechanic} />
+      )}
 
       {/* Recent Jobs */}
       <Card>

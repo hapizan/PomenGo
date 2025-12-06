@@ -38,6 +38,35 @@ npm run dev
 
 3. Open [http://localhost:3000](http://localhost:3000) in your browser
 
+## Demo Login Accounts
+
+For testing purposes, you can use the following demo accounts:
+
+### Customer Account
+- **Email**: `customer@example.com`
+- **Password**: Any password (for demo purposes)
+- **Role**: Customer
+- **Access**: Customer dashboard, car management, issue reporting
+
+### Mechanic Account
+- **Email**: `mechanic@example.com`
+- **Password**: Any password (for demo purposes)
+- **Role**: Mechanic
+- **Access**: Mechanic dashboard, job management, wallet
+
+### Admin Account
+- **Email**: `admin@example.com`
+- **Password**: Any password (for demo purposes)
+- **Role**: Admin
+- **Access**: Admin console, user management, dispute resolution
+
+### Social Login Demo
+- **Facebook** → Logs in as Customer
+- **Twitter** → Logs in as Mechanic
+- **Gmail** → Logs in as Admin
+
+> **Note**: These are demo accounts for development/testing. In production, proper authentication and password validation will be implemented.
+
 ## Project Structure
 
 ```

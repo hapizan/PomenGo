@@ -12,52 +12,92 @@ import { LanguageToggle } from "@/components/language-toggle";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Mail, Lock, User, Facebook, Twitter, Chrome, Wrench, UserCircle, Phone, MapPin } from "lucide-react";
 
-type UserRole = "customer" | "mechanic" | null;
+import { UserRole } from "@/types/user";
+import { useAuth } from "@/contexts/AuthContext";
+
+type SignupRole = "customer" | "mechanic" | null;
 
 export default function SignupPage() {
   const router = useRouter();
   const { t } = useLanguage();
+  const { signup } = useAuth();
   const [loading, setLoading] = useState(false);
-  const [selectedRole, setSelectedRole] = useState<UserRole>(null);
+  const [selectedRole, setSelectedRole] = useState<SignupRole>(null);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [phone, setPhone] = useState("");
   const [location, setLocation] = useState("");
+  const [error, setError] = useState("");
 
   const handleEmailSignup = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!selectedRole) return;
-    
-    setLoading(true);
-    // Simulate signup
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    setLoading(false);
-    
-    // Redirect based on role
-    if (selectedRole === "mechanic") {
-      router.push("/mechanic");
-    } else {
-      router.push("/customer");
-    }
-  };
-
-  const handleSocialLogin = async (provider: string, role: UserRole) => {
-    if (!role) {
-      alert("Please select a role first");
+    if (!selectedRole) {
+      setError("Please select a role");
       return;
     }
     
     setLoading(true);
-    // Simulate social signup
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    setLoading(false);
+    setError("");
     
-    // Redirect based on role
-    if (role === "mechanic") {
-      router.push("/mechanic");
+    const result = await signup({
+      name,
+      email,
+      password,
+      phone,
+      role: selectedRole as UserRole,
+    });
+    
+    if (result.success && result.user) {
+      // AuthContext will handle redirect based on role
+      const roleRoutes: Record<string, string> = {
+        customer: "/customer",
+        mechanic: "/mechanic",
+        workshop: "/workshop",
+        admin: "/admin",
+      };
+      router.push(roleRoutes[result.user.role] || "/customer");
     } else {
-      router.push("/customer");
+      setError(result.error || "Signup failed");
+      setLoading(false);
+    }
+  };
+
+  const handleSocialLogin = async (provider: string, role: SignupRole) => {
+    if (!role) {
+      setError("Please select a role first");
+      return;
+    }
+    
+    setLoading(true);
+    setError("");
+    
+    // For demo, create a user with provider-based email
+    const demoEmails: Record<string, string> = {
+      facebook: `${role}@example.com`,
+      twitter: `${role}@example.com`,
+      gmail: `${role}@example.com`,
+    };
+    
+    const result = await signup({
+      name: `${role} User`,
+      email: demoEmails[provider] || `${role}@example.com`,
+      password: "password",
+      phone: "+1234567890",
+      role: role as UserRole,
+    });
+    
+    if (result.success && result.user) {
+      const roleRoutes: Record<string, string> = {
+        customer: "/customer",
+        mechanic: "/mechanic",
+        workshop: "/workshop",
+        admin: "/admin",
+      };
+      router.push(roleRoutes[result.user.role] || "/customer");
+    } else {
+      setError(result.error || "Signup failed");
+      setLoading(false);
     }
   };
 
@@ -75,11 +115,11 @@ export default function SignupPage() {
         <div className="flex items-center justify-between mb-8">
           <Link href="/" className="flex items-center gap-2">
             <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center">
-              <span className="text-white font-bold text-lg">M</span>
+              <span className="text-white font-bold text-lg">P</span>
             </div>
             <div>
-              <span className="text-xl font-bold">MechanicOnDemand</span>
-              <p className="text-xs text-muted-foreground">Grab for Mechanics</p>
+              <span className="text-xl font-bold">PomenGO</span>
+              <p className="text-xs text-muted-foreground">Your Trusted Auto Repair Partner</p>
             </div>
           </Link>
           <div className="flex items-center gap-2">
