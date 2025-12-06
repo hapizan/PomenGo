@@ -8,6 +8,22 @@ import { Badge } from "@/components/ui/badge";
 import { getMechanics } from "@/lib/mock-services";
 import { Mechanic } from "@/types/user";
 import { RatingsDisplay } from "@/components/mechanic/RatingsDisplay";
+import dynamic from "next/dynamic";
+
+// Dynamically import map to avoid SSR issues
+const MyLocationMap = dynamic(
+  () => import("@/components/mechanic/MyLocationMap").then((mod) => ({ default: mod.MyLocationMap })),
+  {
+    ssr: false,
+    loading: () => (
+      <Card>
+        <CardContent className="py-12 text-center">
+          <p className="text-muted-foreground">Loading map...</p>
+        </CardContent>
+      </Card>
+    ),
+  }
+);
 
 export default function MechanicProfilePage() {
   const [loading, setLoading] = useState(false);
@@ -106,6 +122,40 @@ export default function MechanicProfilePage() {
           </Button>
         </CardContent>
       </Card>
+
+      {/* Location Map */}
+      {mechanic && (
+        <div className="grid gap-6 lg:grid-cols-2">
+          <Card>
+            <CardHeader>
+              <CardTitle>Location</CardTitle>
+              <CardDescription>Your service location coordinates</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="p-3 bg-muted rounded-lg">
+                  <p className="text-xs text-muted-foreground mb-1">Latitude</p>
+                  <p className="text-sm font-mono font-semibold">{mechanic.location_lat.toFixed(6)}</p>
+                </div>
+                <div className="p-3 bg-muted rounded-lg">
+                  <p className="text-xs text-muted-foreground mb-1">Longitude</p>
+                  <p className="text-sm font-mono font-semibold">{mechanic.location_lng.toFixed(6)}</p>
+                </div>
+                <Button variant="outline" className="w-full">
+                  Update Location
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+          <div className="lg:sticky lg:top-6" style={{ minHeight: '500px', height: '500px' }}>
+            <MyLocationMap 
+              lat={mechanic.location_lat} 
+              lng={mechanic.location_lng}
+              editable={false}
+            />
+          </div>
+        </div>
+      )}
 
       {/* Ratings Display */}
       {mechanic && (

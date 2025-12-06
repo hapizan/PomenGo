@@ -10,6 +10,18 @@
   border: none !important;
 }
 
+/* Ensure Leaflet map containers have proper display */
+.leaflet-container {
+  height: 100% !important;
+  width: 100% !important;
+  z-index: 0;
+}
+
+/* Fix for map container in cards */
+[class*="leaflet"] {
+  z-index: 0 !important;
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;

@@ -156,6 +156,9 @@ export function MechanicsMapView({ mechanics, onMechanicSelect }: MechanicsMapVi
           <div style="font-size: 12px; color: #666; margin-bottom: 8px;">
             ${mechanic.specialties.slice(0, 2).join(", ")}
           </div>
+          <div style="font-size: 11px; color: #888; margin-bottom: 8px; padding: 4px; background: #f3f4f6; border-radius: 4px;">
+            📍 ${mechanic.location_lat.toFixed(4)}, ${mechanic.location_lng.toFixed(4)}
+          </div>
           <button 
             onclick="window.selectMechanic('${mechanic.id}')"
             style="
